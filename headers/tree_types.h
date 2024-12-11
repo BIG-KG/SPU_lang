@@ -4,6 +4,11 @@
 #include <stdint.h>
 #include "tree_const.h"
 
+const int MAX_OPERATION_NAME_SIZE = 128;
+const int MAX_FUNKTION_NAME_SIZE  = 128;
+const int NAO = -1;
+const int NAF = -1;
+
 enum dataTypes
 {
     FUNC = 2,
@@ -70,7 +75,21 @@ struct node_way_t
     int     depth       = 0;
     int    *way         = NULL;
     node_t *node_addres = NULL;
-
 };
+
+struct codeWord_t
+{
+    int  codeWordCode = NAO;
+    char wordName[MAX_OPERATION_NAME_SIZE] = "";
+};
+
+struct funktion_t
+{
+    int  funktionCode = NAF;
+    char funktionName[MAX_FUNKTION_NAME_SIZE] = "";
+    int  numOfArguments = -1;
+};
+
+codeWord_t o = {};
 
 #endif /*TREE_TYPES*/
