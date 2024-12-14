@@ -7,7 +7,7 @@
 const int MAX_OPERATION_NAME_SIZE = 128;
 const int MAX_FUNKTION_NAME_SIZE  = 128;
 const int NAO = -1;
-const int NAF = -1;
+const int NOTAFUNC = -1;
 
 enum dataTypes
 {
@@ -21,7 +21,7 @@ enum funcs
     SIN,
     COS,
     LOGN,
-    DIF,
+    DF,
     SUM,
     SUB,
     DIV,
@@ -50,6 +50,36 @@ struct calc_node
     calc_node_data nodeData = {};
 };
 
+union analis_node_data
+{
+    double double_el = 0;
+    int    int_el;
+};
+
+enum dataFormats
+{
+    POISON_FRMT = -1,
+    VOID_FRMT,
+    INT_FRMT,
+    DOUBLE_FRMT
+};
+
+struct lingAnalis_t
+{
+    int              nodeType   = -1; //no data type has code -1
+    analis_node_data nodeData   = {};
+    int              nodeFormat = POISON_FORMAT;
+};
+
+struct analis_node_t
+{
+    int              nodeType   = -1; //no data type has code -1
+    analis_node_data nodeData   = {};
+    int              nodeFormat = POISON_FORMAT;
+    node_t          *right = NULL; 
+    node_t          *left  = NULL;
+
+};
 
 typedef calc_node elem_t;
 
@@ -83,13 +113,13 @@ struct codeWord_t
     char wordName[MAX_OPERATION_NAME_SIZE] = "";
 };
 
-struct funktion_t
+struct funktion_names_t
 {
-    int  funktionCode = NAF;
+    int  funktionCode = NOTAFUNC;
     char funktionName[MAX_FUNKTION_NAME_SIZE] = "";
     int  numOfArguments = -1;
 };
 
-codeWord_t o = {};
+codeWord_t o = {};  
 
 #endif /*TREE_TYPES*/

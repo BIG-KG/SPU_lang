@@ -12,7 +12,8 @@
 char funcs[20][20] = {};
 
 codeWord_t codeWordArr[20] = {};
-funktion_t funcsArr[20] = {};
+funktion_names_t funcsArr[20]    = {};
+variable_t variableArr[20] = {};
 
 #define NAME_STR(a)  #a                 
 

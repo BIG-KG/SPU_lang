@@ -12,13 +12,6 @@ node_t *dif_LN       (node_t *currNode,  tree_t *currTree);
 node_t *dif_POW      (node_t *currNode,  tree_t *currTree);
 node_t *make_const_node();
 
-
-
 int ease_tree (node_t *currNode);
-
-
-
-
-
 
 #endif /*CALC_F*/
