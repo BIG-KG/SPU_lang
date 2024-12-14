@@ -18,21 +18,25 @@ struct argument_t
     int argumentFrmt = POISON_FRMT;
 };
 
+struct variable_t
+{
+    int variableCode = -1;
+    int variableFrmt = POISON_FRMT;
+};
+
 struct function_t
 {
     char functionCode   = NOTAFUNC;
     int  returningType  = POISON_FORMAT;
 
-    argument_t arguments    [MAX_NUM_ARGUMEN] = {};
-    int  numOfArguments   = -1;
+    argument_t arguments [MAX_NUM_ARGUMEN] = {};
+    int  numOfArguments                    = -1;
 
-    int intVariablesCODE    [MAX_NUM_INT_VAR] = {};
-    int numberOfIntVar    =  0;
+    variable_t VariablesCODE [MAX_NUM_INT_VAR] = {};
+    int        numberOfIntVar                  =  0;
 
-    int doubleVariaclesCODE [MAX_NUM_DBL_VAR] = {};
-    int numberOfdoubleVar =  0;
-
-    analis_node_t *commands = NULL;
+    analis_node_t *commands[128]      = {};
+    int            numOfCommands = 0;
 };
 
 enum element_types
@@ -46,6 +50,7 @@ enum element_types
     END_COMMAND,
     ERROR_EL,
     WORD_EL,
+    FRMT_CHANGE,
     COMMA,
     BRAKES,
     END_OF_PROGRAM,

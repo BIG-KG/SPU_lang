@@ -38,6 +38,7 @@ int element_type (char checkingEl)
     if (isOperation (currEl))   return OPER;
     if (isalpha (checkingEl))   return WORD_EL;
     if (isalnum (checkingEl))   return CONST;
+    if (checkingEl == ':')      return FRMT_CHANGE;
     if (checkingEl == ',')      return COMMA;
     if (checkingEl == '=')      return EQUAL;
     if (checkingEl == ';')      return END_COMMAND;
@@ -76,6 +77,11 @@ analis_node_t *startLing (const char *string)
 
             case END_COMMAND:
                 nodeArr[currNode] = make_onlyType_node(END_COMMAND);
+                currEL ++;
+                break;
+
+            case FRMT_CHANGE:
+                nodeArr[currNode] = make_onlyType_node(FRMT_CHANGE);
                 currEL ++;
                 break;
 
@@ -188,6 +194,9 @@ static analis_node_t scanOperation (const char *string, int *startEl)
         break;
     case '/':
         returningNode.nodeData.int_el = DIV;
+        break;
+    case '^':
+        returningNode.nodeData.int_el = POW;
         break;
     default:
         printf("Error in operation: %c\n", string[*startEl]);
