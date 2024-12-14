@@ -12,16 +12,25 @@ const int MAX_NUM_DBL_VAR = 128;
 const int MAX_NUM_ARGUMEN = 128;
 const int MAX_NUM_CMD_FNK = 512;
 
+struct argument_t
+{
+    int argumentCode = -1;
+    int argumentFrmt = POISON_FRMT;
+};
+
 struct function_t
 {
     char functionCode   = NOTAFUNC;
-    int  numOfArguments = -1;
     int  returningType  = POISON_FORMAT;
 
-    int argumentsCODE       [MAX_NUM_ARGUMEN] = {};
+    argument_t arguments    [MAX_NUM_ARGUMEN] = {};
+    int  numOfArguments   = -1;
 
     int intVariablesCODE    [MAX_NUM_INT_VAR] = {};
+    int numberOfIntVar    =  0;
+
     int doubleVariaclesCODE [MAX_NUM_DBL_VAR] = {};
+    int numberOfdoubleVar =  0;
 
     analis_node_t *commands = NULL;
 };
@@ -37,6 +46,7 @@ enum element_types
     END_COMMAND,
     ERROR_EL,
     WORD_EL,
+    COMMA,
     BRAKES,
     END_OF_PROGRAM,
     SYNTAX_ERROR

@@ -38,6 +38,7 @@ int element_type (char checkingEl)
     if (isOperation (currEl))   return OPER;
     if (isalpha (checkingEl))   return WORD_EL;
     if (isalnum (checkingEl))   return CONST;
+    if (checkingEl == ',')      return COMMA;
     if (checkingEl == '=')      return EQUAL;
     if (checkingEl == ';')      return END_COMMAND;
 
@@ -75,18 +76,23 @@ analis_node_t *startLing (const char *string)
 
             case END_COMMAND:
                 nodeArr[currNode] = make_onlyType_node(END_COMMAND);
-                currEL = currEL + 1;
+                currEL ++;
                 break;
 
             case EQUAL:
                 nodeArr[currNode] = make_onlyType_node(EQUAL);
-                currEL = currEL + 1;
+                currEL ++;
+                break;
+
+            case COMMA:
+                nodeArr[currNode] = make_onlyType_node(COMMA);
+                currEL ++;
                 break;
 
             case BRAKES:
                 nodeArr[currNode] = make_brakesNode(string, &currEl);
                 break;
-                
+
             case SYNTAX_ERROR:
             default:
                 printf ("Syntax error in %d symbol", currEl);

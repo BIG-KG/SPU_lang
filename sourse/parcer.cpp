@@ -14,7 +14,12 @@
 #include <comporator.h>
 #include <compiller_types.h>
 
-static int isInicialiser(analis_node_t testingNode);
+static int isInicialiser  (analis_node_t testingNode);
+static int isRightBracket (analis_node_t testingNode, int rightBrackes);
+
+static void getInicialArgs(function_t *currFunc, processing_programm_t *currProg);
+static void getCommands   (function_t *currFunc, processing_programm_t *currProg);
+
 
 const int FUNK_NAME_SIZE = 30;
 const int NUM_OF_FUNK    = 20;
@@ -24,6 +29,12 @@ const int MAX_NUM_OF_FUNK   = 128;
 extern char funcs[][20];
 
 #define pp(a) a = a + 1 
+
+#define GLOBAL_ERROR                        \
+    printf("Error on line %d\n", __LINE__); \
+    global_errors = SYNTAX_ERROR;           \
+    return;                                 \
+
 
 enum codewords
 {
@@ -138,8 +149,99 @@ void getFunction (processing_programm_t *currProg)
     functionArray[*numOfFunc].functionCode = nodeArr[*currNode].nodeData.int_el;
     pp(*currNode);
 
+
+
+    if (isRightBracket (nodeArr[*currNode], '(') == 0){GLOBAL_ERROR}
+    pp(*currNode);
+
+    getInicialArgs(&functionArray[*numOfFunc], currProg);    
+
+    if (isRightBracket (nodeArr[*currNode], ')') == 0){GLOBAL_ERROR}
+    pp(*currNode);
+
+
+
+    if (isRightBracket (nodeArr[*currNode], '{') == 0){GLOBAL_ERROR}
+    pp(*currNode);
+
+    getCommands(&functionArray[*numOfFunc], currProg);
+
+    if (isRightBracket (nodeArr[*currNode], '}') == 0){GLOBAL_ERROR}
+    pp(*currNode);
+}
+
+static void getInicialArgs(function_t *currFunc, processing_programm_t *currProg)
+{
+    analis_node_t *nodeArr       = currProg->nodeArr;
+    int           *currNode      = currProg->currNode;
+
+    int *numOfArg = &currFunc->numOfArguments;
+    int *numOfIts = &currFunc->numberOfIntVar;
+    int *numOfDbl = &currFunc->numberOfdoubleVar;
+    int  currFrmt =  POISON_FRMT;
+    int  currCode =  -1;
+
+    *numOfArg = 0;
+
+    while ( isInicialiser(nodeArr[*currNode]) )
+    {   
+        if (*numOfArg > 0 && nodeArr[*currNode - 1].nodeType != COMMA) {GLOBAL_ERROR}
+
+
+        currFrmt = (currFunc->arguments[*numOfArg].argumentFrmt = nodeArr[*currNode].nodeData.int_el);
+        pp(*currNode);
+
+
+        if (nodeArr[*currNode].nodeType != VARIABLE){GLOBAL_ERROR}
+        currCode = (currFunc->arguments[*numOfArg].argumentCode = nodeArr[*currNode].nodeData.int_el);
+        pp(*currNode);
+
+
+        if     (currFrmt == INT_FRMT)
+        {
+            currFunc->intVariablesCODE[*numOfIts] = currCode;
+            pp(*numOfIts);
+        }
+
+        else if(currFrmt == DOUBLE_FRMT)
+        {
+            currFunc->doubleVariaclesCODE[*numOfDbl] = currCode;
+            pp(*numOfDbl);  
+        }
+
+        else {GLOBAL_ERROR}
+
+
+        pp(*numOfArg);
+
+        if (nodeArr[*currNode].nodeType == COMMA)
+        {
+            pp(*currNode);
+        }
+    }
+
+    return;    
+}
+
+
+static void getCommands(function_t *currFunc, processing_programm_t *currProg)
+{
+    function_t    *functionArray = currProg->functionArr;
+    analis_node_t *nodeArr       = currProg->nodeArr;
+    int           *currNode      = currProg->currNode;
+    int           *numOfFunc     = currProg->numOfFunction;
+
+    if (nodeArr[*currNode].nodeType == CODEWORD)
+    {
+        getCodeword(currFunc, currProg);
+    }
+    else
+    {
+        getExpression()
+    }
     
 }
+ 
 
 node_t *getDouble(isInicialiser(nodeArr[*currNode]))
 {
@@ -308,4 +410,10 @@ static int isInicialiser(analis_node_t testingNode)
     return 0;
 }
 
-static int isRightBrackets(analis_node_t testingNode)
+static int isRightBracket(analis_node_t testingNode, int rightBrackes)
+{
+    if (testingNode.nodeData.int_el == rightBrackes &&
+            testingNode.nodeType == BRAKES) return 1;
+
+    return 0;
+}
