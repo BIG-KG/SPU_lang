@@ -7,6 +7,8 @@
 const int NANODE = -1;
 const int NOTAFUNC    = -1;
 
+const int MAX_VARIABLE_NAME_SIZE = 128;
+
 const int MAX_NUM_INT_VAR = 128;
 const int MAX_NUM_DBL_VAR = 128;
 const int MAX_NUM_ARGUMEN = 128;
@@ -20,20 +22,21 @@ struct argument_t
 
 struct variable_t
 {
-    int variableCode = -1;
-    int variableFrmt = POISON_FRMT;
+    int  variableCode                         = -1;
+    int  variableFrmt                         = POISON_FRMT;
+    char variableName[MAX_VARIABLE_NAME_SIZE] = "";
 };
 
 struct function_t
 {
     char functionCode   = NOTAFUNC;
-    int  returningType  = POISON_FORMAT;
+    int  returningType  = POISON_FRMT;
 
     argument_t arguments [MAX_NUM_ARGUMEN] = {};
-    int  numOfArguments                    = -1;
+    int        numOfArguments              = -1;
 
     variable_t VariablesCODE [MAX_NUM_INT_VAR] = {};
-    int        numberOfIntVar                  =  0;
+    int        numberOfVar                     =  0;
 
     analis_node_t *commands[128]      = {};
     int            numOfCommands = 0;
@@ -46,6 +49,7 @@ enum element_types
     FUNC,
     OPER, 
     EQUAL,
+    COMPARISON,
     CODEWORD,
     END_COMMAND,
     ERROR_EL,
@@ -60,6 +64,8 @@ enum element_types
 enum codeWords
 {
     IF_CODE_WORD,
+    ENDIF_CODE_WORD,
+    ENDWILE_CODE_WORD,
     WHILE_CODE_WORD,
     INT_CODE_WORD,
     DOUBLE_CODE_WORD
@@ -74,6 +80,18 @@ enum brackets
     OPEN_FIG,
     CLSE_FIG,
 };
+
+
+enum comparison
+{
+    IS_EQUAL,
+    IS_NOT_EQUAL,
+    GREATER_OR_EQU,
+    LESS_OR_EQU,
+    LESS,
+    GEATER
+}
+
 
 struct processing_programm_t
 {

@@ -15,13 +15,15 @@
 #include "..\headers\errors.h"
 #include <compiller_types.h>
 
+#define pp(a) a = a + 1 
+
 const int START_ARR = 16;
 const int MAX_COMMAND_SIZE = 128;
 char      string[100] = "x = 5y - sin(2);";
 int       currEl = 0;
 
-extern codeWord_t codeWordArr[];
-extern variable_t variableArr[];
+extern codeWord_t       codeWordArr[];
+extern variable_t       variableArr[];
 extern funktion_names_t funcsArr[];
 
 static analis_node_t make_funknode         (char *funckName);
@@ -34,14 +36,14 @@ static analis_node_t make_endOfCommandNode ();
 
 int element_type (char checkingEl)
 {   
-    if (isBracket (checkingEl)) return BRAKES;
-    if (isOperation (currEl))   return OPER;
-    if (isalpha (checkingEl))   return WORD_EL;
-    if (isalnum (checkingEl))   return CONST;
-    if (checkingEl == ':')      return FRMT_CHANGE;
-    if (checkingEl == ',')      return COMMA;
-    if (checkingEl == '=')      return EQUAL;
-    if (checkingEl == ';')      return END_COMMAND;
+    if (isBracket (checkingEl))   return BRAKES;
+    if (isOperation (currEl))     return OPER;
+    if (isalpha (checkingEl))     return WORD_EL;
+    if (isalnum (checkingEl))     return CONST;
+    if (checkingEl == ':')        return FRMT_CHANGE;
+    if (checkingEl == ',')        return COMMA;
+    if (isComparison(checkingEl)) return EQUAL;
+    if (checkingEl == ';')        return END_COMMAND;
 
     return SYNTAX_ERROR;
 }
@@ -86,7 +88,7 @@ analis_node_t *startLing (const char *string)
                 break;
 
             case EQUAL:
-                nodeArr[currNode] = make_onlyType_node(EQUAL);
+                nodeArr[currNode] = scanEquality (string, &currEl);
                 currEL ++;
                 break;
 
@@ -151,22 +153,23 @@ static analis_node_t make_brakesNode (const char *string, int *startEl)
     switch (string[*startEl])
     {
         case '(':
-            returningNode.nodeData.int_el = OPEN_CIR;
+            returningNode.nodeData.int_el = '(';
             break;
         case ')':
-            returningNode.nodeData.int_el = CLSE_CIR;
+            returningNode.nodeData.int_el = ')';
             break;
         case '[':
-            returningNode.nodeData.int_el = OPEN_SQR;
+            returningNode.nodeData.int_el = '[';
             break;
         case ']':
-            returningNode.nodeData.int_el = CLSE_SQR;
+            returningNode.nodeData.int_el = ']';
             break;
         case '{':
-            returningNode.nodeData.int_el = OPEN_FIG;
+            returningNode.nodeData.int_el = '{';
+            returningNode.nodeType        = CODEWORD;
             break;
         case '}':
-            returningNode.nodeData.int_el = CLSE_FIG;
+            returningNode.nodeData.int_el = '}';
             break;
     //REFACTOR WITH CODEGEN!!!!!!!!!!!!!!!!!!!!!!!!
         default:
@@ -294,7 +297,23 @@ static int isOperation(char chekingEl)
         case '-':
         case '/':
         case '*':
-        case '^':
+            return 1;
+            break;
+        default:
+            return 0;
+            break;
+    }
+}
+
+static int isComparison(char chekingEl)
+{
+    switch (chekingEl)
+    {
+        case '=':
+        case '>':
+        case '<':
+        case '!':
+        case '?':
             return 1;
             break;
         default:
@@ -329,6 +348,40 @@ static analis_node_t make_funknode(char * command)
 
     return returningNode;
 }
+
+analis_node_t scanEquality (const char *string, int *startEl)
+{   
+    char operation[3]           = "";
+    analis_node_t returningNode = {};
+
+    returningNode.nodeType      = COMPARISON;
+
+    if ( isComparison (string[*startEl + 1]) )
+    {
+        memcpy(operation, string + *startEl, 2);
+        *startEl = *startEl + 2;
+
+        if ( !strcmp(operation, "?=") ) returningNode.nodeData.int_el = IS_EQUAL;
+        if ( !strcmp(operation, "!=") ) returningNode.nodeData.int_el = IS_EQUAL;
+        if ( !strcmp(operation, ">=") ) returningNode.nodeData.int_el = GREATER_OR_EQU;
+        if ( !strcmp(operation, "<=") ) returningNode.nodeData.int_el = LESS_OR_EQU;
+    }
+    else
+    {
+        operation[0] = string[*startEl];
+        pp(*startEl);
+
+        if( !strcmp(operation, ">")  ) returningNode.nodeData.int_el = GEATER;
+        if( !strcmp(operation, "<")  ) returningNode.nodeData.int_el = LESS;
+        if( !strcmp(operation, "=")  ) 
+        {
+            returningNode.nodeType = EQUAL;
+        }
+    }
+
+    return returningNode;
+}
+
 
 static analis_node_t make_operation_node(int codewordCode)
 {

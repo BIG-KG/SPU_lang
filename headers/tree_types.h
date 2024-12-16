@@ -73,11 +73,11 @@ struct lingAnalis_t
 
 struct analis_node_t
 {
-    int              nodeType   = -1; //no data type has code -1
-    analis_node_data nodeData   = {};
-    int              nodeFormat = POISON_FORMAT;
-    node_t          *right = NULL; 
-    node_t          *left  = NULL;
+    int               nodeType   = -1; //no data type has code -1
+    analis_node_data  nodeData   = {};
+    int               nodeFormat = POISON_FORMAT;
+    analis_node_t    *right = NULL; 
+    analis_node_t    *left  = NULL;
 
 };
 
@@ -117,7 +117,7 @@ struct funktion_names_t
 {
     int  funktionCode = NOTAFUNC;
     char funktionName[MAX_FUNKTION_NAME_SIZE] = "";
-    int  numOfArguments = -1;
+          numOfArguments = -1;
 };
 
 codeWord_t o = {};  
