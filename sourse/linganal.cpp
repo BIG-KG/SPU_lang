@@ -15,12 +15,12 @@
 
 #define pp(a) a = a + 1 
 
-const int START_ARR = 16;
+const int START_ARR = 128; //BAG_WIGTH REALLOC
 const int MAX_COMMAND_SIZE = 128;
 int       currEl = 0;
 
 extern codeWord_t        codeWordArr[];
-extern funktion_names_t *funcsArr;
+extern funktion_names_t funcsArr[];
 analis_variable_t       variableArr[20] = {};
 
 
@@ -41,14 +41,16 @@ static int           isBracket             (char chekingEl);
 
 int element_type (char checkingEl)
 {   
+    printf("chekingEL = _%c_\n", checkingEl);
+    
+    if (checkingEl == ';')        { printf("endCommandscan\n"); return END_COMMAND; }
     if (isBracket (checkingEl))   return BRAKES;
     if (isOperation (checkingEl)) return OPER;
     if (isalpha (checkingEl))     return WORD_EL;
-    if (isalnum (checkingEl))     return CONST;
+    if (isdigit (checkingEl))     return CONST;
     if (checkingEl == ':')        return FRMT_CHANGE;
     if (checkingEl == ',')        return COMMA;
     if (isComparison(checkingEl)) return EQUAL;
-    if (checkingEl == ';')        return END_COMMAND;
 
     return SYNTAX_ERROR;
 }
@@ -57,14 +59,15 @@ analis_node_t *startLing (const char *string)
 {
     analis_node_t *nodeArr   = (analis_node_t *) calloc (START_ARR, sizeof(analis_node_t));
     int     currNodeCapacity = START_ARR; 
-    int     currEL           = 0;
+    int     currEl           = 0;
     int     currNode         = 0;
     int     currType         = ERROR_EL;
     
 
     while (string[currEl] != '\0') 
     {
-        printf("while\n");
+        printf("\n\nsdfsdfsvf = %d\n", nodeArr[1].nodeType);
+        printf("while currel = %d, currnode = %d\n", currEl, currNode);
         while ( isspace (string[currEl]) ) currEl++;
         
         currType = element_type (string[currEl]);
@@ -73,39 +76,50 @@ analis_node_t *startLing (const char *string)
         switch (currType)
         {
             case CONST:
+                printf("sdfsdfsvf = %d\n", nodeArr[1].nodeType);
+                printf("const\n");
                 nodeArr[currNode] = scanDouble (string, &currEl);
+                printf("sdfsdfsvf = %d\n", nodeArr[1].nodeType);
                 break;
 
             case OPER:
+                printf("oper\n");
                 nodeArr[currNode] = scanOperation (string, &currEl);
                 break;
 
             case WORD_EL:
-                printf("wordEl\n");
+                printf("word el\n");
                 nodeArr[currNode] = scanWord (string, &currEl);
+                printf("nodetype = %d\n", nodeArr[currNode].nodeType);
                 break;
 
             case END_COMMAND:
+                printf("end_command\n");
                 nodeArr[currNode] = make_onlyType_node(END_COMMAND);
-                currEL ++;
+                printf("ce1 = %d\n", currEl);
+                currEl ++;
+                printf("ce2 = %d\n", currEl);
                 break;
 
             case FRMT_CHANGE:
+                printf("frmt_change\n");
                 nodeArr[currNode] = make_onlyType_node(FRMT_CHANGE);
-                currEL ++;
+                currEl ++;
                 break;
 
             case EQUAL:
+                printf("equal\n");
                 nodeArr[currNode] = scanEquality (string, &currEl);
-                currEL ++;
                 break;
 
             case COMMA:
+                printf("comma\n");
                 nodeArr[currNode] = make_onlyType_node(COMMA);
-                currEL ++;
+                currEl ++;
                 break;
 
             case BRAKES:
+                printf("brakes\n");
                 nodeArr[currNode] = make_brakesNode(string, &currEl);
                 break;
 
@@ -119,6 +133,8 @@ analis_node_t *startLing (const char *string)
                 free(nodeArr);
             }
         }
+
+        printf("type = %d\n", nodeArr[currNode].nodeType);
                         /*One more element for end_of_program*/
                         /*                 |                 */
         if (currNode == currNodeCapacity - 2)
@@ -135,8 +151,9 @@ analis_node_t *startLing (const char *string)
         }
 
         currNode ++; 
-        currEl ++;  
+        //currEl ++;  
     }
+
 
     nodeArr[currNode] = make_onlyType_node(END_OF_PROGRAM);
 
@@ -175,7 +192,6 @@ static analis_node_t make_brakesNode (const char *string, int *startEl)
             break;
         case '{':
             returningNode.nodeData.int_el = '{';
-            returningNode.nodeType        = CODEWORD;
             break;
         case '}':
             returningNode.nodeData.int_el = '}';
@@ -185,13 +201,14 @@ static analis_node_t make_brakesNode (const char *string, int *startEl)
             returningNode.nodeData.int_el = SYNTAX_ERROR;
             break;
     }
+    pp(*startEl);
 
     return returningNode;
 }
 
 static analis_node_t scanOperation (const char *string, int *startEl)
 {
-    analis_node_t returningNode = {};
+    analis_node_t returningNode = {OPER,};
 
     switch (string[*startEl])
     {
@@ -263,9 +280,9 @@ analis_node_t scanWord (const char *string, int *startEl)
     command[currPos] = '\0';
     *startEl = *startEl + currPos;
 
-    //printf("test func\n");
+    printf("next element = %c\n", string[*startEl + currPos]) ;
 
-    if (string[*startEl + currPos] == '(')
+    if (string[*startEl] == '(')
     {   
         *startEl = *startEl + 1;
         return make_funknode (command);
@@ -275,9 +292,10 @@ analis_node_t scanWord (const char *string, int *startEl)
 
     for (int i = 0; codeWordArr[i].codeWordCode != NAO; i++)
     {
-        if (strcasecmp (command, codeWordArr[i].wordName) == 0)
-        {
-            return make_operation_node (i);
+        if (strcmp (command, codeWordArr[i].wordName) == 0)
+        {   
+            printf("codeaWprd num = %d, %s\n", i, command);
+            return make_operation_node (codeWordArr[i].codeWordCode);
         }
     }
 
@@ -339,6 +357,7 @@ static int isComparison(char chekingEl)
 
 static analis_node_t make_funknode(char * command)
 {
+    printf("makefuncnode\n");
     analis_node_t returningNode = {FUNC,};
 
     if(command == NULL)
@@ -347,6 +366,8 @@ static analis_node_t make_funknode(char * command)
         returningNode.nodeType = SYNTAX_ERROR;
         return returningNode;
     }
+
+    printf("startfind funcnode\n");
 
     int i = 0;
     for(i; funcsArr[i].funktionCode != NOTAFUNC; i++)
@@ -357,9 +378,14 @@ static analis_node_t make_funknode(char * command)
             return returningNode;
         }    
     }
+
+    printf("endfind funcnode\n");
+
     funcsArr[i].funktionCode = i;
     strcpy (funcsArr[i].funktionName, command);
     returningNode.nodeData.int_el = i;
+
+    printf("end funcnode type = %d\n", returningNode.nodeType);
 
     return returningNode;
 }

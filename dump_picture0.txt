@@ -1,0 +1,28 @@
+digraph G {	node13330512 [shape=Mrecord, style="rounded, filled", label = "0 " ]; 
+node13330512 -> node13264152;
+	node13264152 [shape=Mrecord, style="rounded, filled", label = "15 " ]; 
+node13264152 -> node13264072;
+	node13264072 [shape=Mrecord, style="rounded, filled", label = "5 " ]; 
+node13264072 -> node13264032;
+	node13264032 [shape=Mrecord, style="rounded, filled", label = "2 " ]; 
+node13264072 -> node13264112;
+	node13264112 [shape=Mrecord, style="rounded, filled", label = "2 " ]; 
+node13264152 -> node13264392;
+	node13264392 [shape=Mrecord, style="rounded, filled", label = "15 " ]; 
+node13264392 -> node13264232;
+	node13264232 [shape=Mrecord, style="rounded, filled", label = "5 " ]; 
+node13264232 -> node13264192;
+	node13264192 [shape=Mrecord, style="rounded, filled", label = "2 " ]; 
+node13264232 -> node13264312;
+	node13264312 [shape=Mrecord, style="rounded, filled", label = "1 " ]; 
+node13264312 -> node13264272;
+	node13264272 [shape=Mrecord, style="rounded, filled", label = "1 " ]; 
+node13264312 -> node13264352;
+	node13264352 [shape=Mrecord, style="rounded, filled", label = "1 " ]; 
+node13264392 -> node13264512;
+	node13264512 [shape=Mrecord, style="rounded, filled", label = "15 " ]; 
+node13264512 -> node13264432;
+	node13264432 [shape=Mrecord, style="rounded, filled", label = "7 " ]; 
+node13264432 -> node13264472;
+	node13264472 [shape=Mrecord, style="rounded, filled", label = "1 " ]; 
+}

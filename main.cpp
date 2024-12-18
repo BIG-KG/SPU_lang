@@ -20,20 +20,38 @@ extern analis_variable_t       variableArr;
 
 #define NAME_STR(a)  #a                 
 
+
 __attribute__((constructor))
 void make_codeWordArr()
 {
     codeWordArr[0] = {IF_CODE_WORD,     "if"    };
     codeWordArr[1] = {WHILE_CODE_WORD,  "while" };
     codeWordArr[2] = {INT_CODE_WORD,    "int"   };
-    codeWordArr[3] = {DOUBLE_CODE_WORD, "double"};
+    codeWordArr[3] = {RETURN,           "return"};
 }
 
+function_t *getMain(analis_node_t *nodeArr);
 
 
 int main()
 {
-    startLing("int x = 8; x = 5 + 2");
+    analis_node_t *nodes =  startLing("int f(int t){ x = i ; x = 5 + 2; return 0; }");
+
+    int i = 0;
+
+    while(nodes[i].nodeType != END_OF_PROGRAM)
+    {
+        printf("%d type = %d\n", i, nodes[i].nodeType);
+        i++;
+    }
+
+    printf("end lganalis__________________________________________\n");
+    printf("######################################################\n\n\n");
+
+    function_t *functionArray = getMain(nodes);
+
+    generate_html(&functionArray->commandStart);
+
 
     printf("Hello, word!\n");
 

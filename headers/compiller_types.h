@@ -51,6 +51,7 @@ struct function_t
 
 enum element_types
 {   
+    END_OF_PROGRAM,
     CONST,
     VARIABLE,
     FUNC,
@@ -64,7 +65,6 @@ enum element_types
     FRMT_CHANGE,
     COMMA,
     BRAKES,
-    END_OF_PROGRAM,
     SYNTAX_ERROR,
     EMPTY_NODE
 };
@@ -76,7 +76,7 @@ enum codeWords
     ENDWILE_CODE_WORD,
     WHILE_CODE_WORD,
     INT_CODE_WORD,
-    DOUBLE_CODE_WORD
+    RETURN
 };
 
 enum brackets

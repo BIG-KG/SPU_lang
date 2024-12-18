@@ -8,10 +8,10 @@ hello: $(OBJS) main.o
 	g++ main.o $(OBJS) -o hell.exe
 
 main.o: main.cpp
-	g++ -I ./headers main.cpp -c
+	g++ -c main.cpp -I ./headers 
 
 %.o: %.cpp
-	g++ -I ./headers -c $< -o $@
+	g++  -c $< -o $@ -I ./headers
 
 clean:
 	DEL *.o

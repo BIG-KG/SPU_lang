@@ -12,8 +12,8 @@ const int FILE_NAME_SIZE = 64;
 
 extern char funcs[20][20];
 
-/*
-int generate_html(tree_t *tree)
+
+int generate_html(analis_node_t *tree)
 {
 
     static int  dumpNum = 0                   ;
@@ -40,7 +40,7 @@ int generate_html(tree_t *tree)
 }
 
 
-char *generate_png(tree_t *dumpingTree, int dumpNum)
+char *generate_png(analis_node_t *dumpingTree, int dumpNum)
 {
     char        txtFile_name [FILE_NAME_SIZE] = {};
     static char pngFile_name [FILE_NAME_SIZE] = {};
@@ -51,7 +51,7 @@ char *generate_png(tree_t *dumpingTree, int dumpNum)
     FILE *txtFile = fopen(txtFile_name, "w");
 
     fprintf    (txtFile, "digraph G {");
-    print_node (dumpingTree->treeStart, txtFile);
+    print_node (dumpingTree, txtFile);
     fprintf    (txtFile, "}");
 
     fclose(txtFile);
@@ -62,7 +62,7 @@ char *generate_png(tree_t *dumpingTree, int dumpNum)
     system (sysCommand);
 
     return pngFile_name;
-}*/
+}
 
 
 // void console_print_node(analis_node_t *curr_node)
@@ -75,27 +75,12 @@ char *generate_png(tree_t *dumpingTree, int dumpNum)
 
 // }
 
-/*
-void console_print_node(node_t *curr_node, FILE *txtFile)
+
+void print_node(analis_node_t *curr_node, FILE *txtFile)
 {   
     fprintf (txtFile, "\tnode%d [shape=Mrecord, style=\"rounded, filled\"", curr_node);
 
-    if     (curr_node->data.nodeType == CONST)
-    {
-        fprintf (txtFile, ", label = \"%lf \" ]; \n", curr_node->data.nodeData.cnst);
-    }
-    else if(curr_node->data.nodeType == VARIABLE)
-    {
-        fprintf (txtFile, ", label = \"%c\" ]; \n", curr_node->data.nodeData.var);
-    }
-    else if(curr_node->data.nodeType == FUNC)
-    {
-        fprintf (txtFile, ", label = \"%s\" ]; \n", funcs[curr_node->data.nodeData.func]);
-    }
-    else
-    {
-        fprintf (txtFile, ", label = \"%d\" ]; \n", curr_node->data.nodeType);
-    }
+    fprintf (txtFile, ", label = \"%d \" ]; \n", curr_node->nodeType);
 
     if(curr_node->left != NULL)
     {   
@@ -113,4 +98,4 @@ void console_print_node(node_t *curr_node, FILE *txtFile)
     }
 
     return;
-}*/
+}
