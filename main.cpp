@@ -35,7 +35,7 @@ function_t *getMain(analis_node_t *nodeArr);
 
 int main()
 {
-    analis_node_t *nodes =  startLing("int f(int t){ x = i ; x = 5 + 2; return 0; }");
+    analis_node_t *nodes =  startLing("int f(int t){ if(x > i){i = x + 6;}; x = 5 + 2; return 0; }");
 
     int i = 0;
 

@@ -280,6 +280,15 @@ analis_node_t scanWord (const char *string, int *startEl)
     command[currPos] = '\0';
     *startEl = *startEl + currPos;
 
+    for (int i = 0; codeWordArr[i].codeWordCode != NAO; i++)
+    {
+        if (strcmp (command, codeWordArr[i].wordName) == 0)
+        {   
+            printf("codeaWprd num = %d, %s\n", i, command);
+            return make_operation_node (codeWordArr[i].codeWordCode);
+        }
+    }
+
     printf("next element = %c\n", string[*startEl + currPos]) ;
 
     if (string[*startEl] == '(')
@@ -289,15 +298,6 @@ analis_node_t scanWord (const char *string, int *startEl)
     }
     
     //printf("test codeWord\n");
-
-    for (int i = 0; codeWordArr[i].codeWordCode != NAO; i++)
-    {
-        if (strcmp (command, codeWordArr[i].wordName) == 0)
-        {   
-            printf("codeaWprd num = %d, %s\n", i, command);
-            return make_operation_node (codeWordArr[i].codeWordCode);
-        }
-    }
 
     //printf("variabl\n");
     return make_variableNode (command); 

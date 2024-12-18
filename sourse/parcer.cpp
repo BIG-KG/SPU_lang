@@ -572,20 +572,20 @@ static analis_node_t *getWhile (function_t *currFunc, processing_programm_t *cur
     analis_node_t *whileNode = &nodeArr[*currNode];
     pp(*currNode);
 
-    if ( isRightBracket (nodeArr[*currNode], '(') ) {GLOBAL_ERROR_NULL}
+    if ( !isRightBracket (nodeArr[*currNode], '(') ) {GLOBAL_ERROR_NULL}
     pp(*currNode);
     whileNode->left = getExpression(currFunc, currProg);
     pp(currFunc->numOfCommands);
 
-    if ( isRightBracket (nodeArr[*currNode], ')') ) {GLOBAL_ERROR_NULL}
+    if ( !isRightBracket (nodeArr[*currNode], ')') ) {GLOBAL_ERROR_NULL}
     pp(*currNode);
 
 
 
-    if ( isRightBracket (nodeArr[*currNode], '{') ) {GLOBAL_ERROR_NULL}
+    if ( !isRightBracket (nodeArr[*currNode], '{') ) {GLOBAL_ERROR_NULL}
     pp(*currNode);
     getCommands(currFunc, currProg, whileNode);
-    if ( isRightBracket (nodeArr[*currNode], '}') ) {GLOBAL_ERROR_NULL}
+    if ( !isRightBracket (nodeArr[*currNode], '}') ) {GLOBAL_ERROR_NULL}
     pp(*currNode);
 
     return whileNode;     
