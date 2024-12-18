@@ -8,7 +8,7 @@
 
 #include <tree_types.h>
 #include <tree_funck.h>
-//#include <tree_data_base_funk.h>
+#include <colors.h>
 #include <tree_const.h>
 //#include <calculator.h>
 #include <compiller_types.h>
@@ -41,13 +41,13 @@ extern char funcs[][20];
 #define pp(a) a = a + 1 
 
 #define GLOBAL_ERROR                        \
-    printf("Error on line %d\n", __LINE__); \
+    printf("%sError on line %d%s\n", RED, __LINE__, RESET); \
     global_errors = SYNTAX_ERROR;           \
     return;                                 \
 
 
 #define GLOBAL_ERROR_NULL                   \
-    printf("Error on line %d\n", __LINE__); \
+    printf("%sError on line %d%s\n", RED, __LINE__, RESET); \
     global_errors = SYNTAX_ERROR;           \
     return NULL;                            \
 
@@ -149,16 +149,17 @@ static void getInicialArgs(function_t *currFunc, processing_programm_t *currProg
         if (*numOfArg > 0 && nodeArr[*currNode - 1].nodeType != COMMA) {GLOBAL_ERROR}
 
 
-        currFrmt = (currFunc->arguments[*numOfArg].argumentFrmt = nodeArr[*currNode].nodeData.int_el);
+        currFrmt = (currFunc->arguments[*numOfArg].variableFrmt = nodeArr[*currNode].nodeData.int_el);
         pp(*currNode);
 
 
         if (nodeArr[*currNode].nodeType != VARIABLE){GLOBAL_ERROR}
-        currCode = (currFunc->arguments[*numOfArg].argumentCode = nodeArr[*currNode].nodeData.int_el);
+        currCode = (currFunc->arguments[*numOfArg].variableCode = nodeArr[*currNode].nodeData.int_el);
         pp(*currNode);
 
         if(currFrmt == INT_CODE_WORD || currFrmt == INT_CODE_WORD)
         {
+            
             currFunc->VariablesCODE[*numOfVar].variableCode = currCode;
             if(currFrmt == INT_CODE_WORD) currFunc->VariablesCODE[*numOfVar].variableFrmt = INT_FRMT;
             else                          currFunc->VariablesCODE[*numOfVar].variableFrmt = INT_FRMT;  
@@ -275,6 +276,7 @@ static analis_node_t *getExpression(function_t *currFunc, processing_programm_t 
         pp(*currNode);
 
         equal->right = getSumSub(currFunc, currProg); 
+        printf("___________type2=%d_____________\n", equal->right->nodeType);
 
         if (equal->right == NULL){GLOBAL_ERROR_NULL}
 
@@ -319,20 +321,12 @@ static analis_node_t *getSumSub (function_t *currFunc, processing_programm_t *cu
 
         if (oper->right == NULL){GLOBAL_ERROR_NULL}
 
-        //Remove for rechecking___________________________________________
-
-        if (oper->left->nodeFormat != oper->right->nodeFormat)
-        {
-            printf ("Сast types before assignment in SumSub\n");
-            GLOBAL_ERROR_NULL
-        }
-
-        oper->nodeType = oper->left->nodeType;
-
-        //_________________________________________________________________
-
         left = oper;
     }
+
+
+    printf("_________type=%d_______________\n", left->nodeType);
+
     return left;
 }
 
@@ -410,7 +404,6 @@ static analis_node_t *getElementar(function_t *currFunc, processing_programm_t *
     int           *currNode      = currProg->currNode;
     analis_node_t *returningNode = NULL;
 
-    //Remove for rechecking__________________________________________________
     if (nodeArr[*currNode].nodeType == VARIABLE)
     {   
         printf("scanvar\n");
@@ -420,19 +413,17 @@ static analis_node_t *getElementar(function_t *currFunc, processing_programm_t *
 
         return returningNode;
 
-    //________________________________________________________________________________
     }
 
     if (nodeArr[*currNode].nodeType == FUNC)
     {   
 
-        //Remove for rechecking________________________________________________________
         bool findFunc = false;
         int i = 0;
 
         returningNode = &nodeArr[*currNode];
 
-        for (i = 0; i < *(currProg->numOfFunction); i ++)
+        for (i = 0; i <= *(currProg->numOfFunction); i ++)
         {
             if(currProg->functionArr[i].functionCode == nodeArr[*currNode].nodeData.int_el)
             {
@@ -447,11 +438,10 @@ static analis_node_t *getElementar(function_t *currFunc, processing_programm_t *
             GLOBAL_ERROR_NULL;
         }
 
-        //______________________________________________________________________________
 
         pp(*currNode);
 
-        getFuncArgs(currFunc, &nodeArr[*currNode], currProg, i);
+        getFuncArgs(currFunc, returningNode, currProg, i);
 
         if (isRightBracket (nodeArr[*currNode], ')') == 0) {GLOBAL_ERROR_NULL}
         pp(*currNode);
@@ -481,9 +471,9 @@ static void getFuncArgs(function_t *currFunc, analis_node_t *currfuncCall,  proc
     int           *numOfFunc     = currProg->numOfFunction;
 
 
-    analis_node_t *right = currfuncCall;
-    argument_t *argTypes = currProg->functionArr[funckNum].arguments;
-    int numOfArgs        = currProg->functionArr[funckNum].numOfArguments;
+    analis_node_t *right    = currfuncCall;
+    variable_t    *argTypes = currProg->functionArr[funckNum].arguments;
+    int numOfArgs           = currProg->functionArr[funckNum].numOfArguments;
 
 
 //If you remove this check, you can add functions to a variable number of variables. + improve structuring by stages

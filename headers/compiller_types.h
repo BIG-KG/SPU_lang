@@ -14,10 +14,10 @@ const int MAX_NUM_DBL_VAR = 128;
 const int MAX_NUM_ARGUMEN = 128;
 const int MAX_NUM_CMD_FNK = 512;
 
-struct argument_t
+struct variable_t
 {
-    int argumentCode = -1;
-    int argumentFrmt = POISON_FRMT;
+    int variableCode = -1;
+    int variableFrmt = POISON_FRMT;
 };
 
 struct analis_variable_t
@@ -27,19 +27,12 @@ struct analis_variable_t
     char variableName[MAX_VARIABLE_NAME_SIZE] = "";
 };
 
-struct variable_t
-{
-    int  variableCode                         = -1;
-    int  variableFrmt                         =  POISON_FRMT;
-    char variableName[MAX_VARIABLE_NAME_SIZE] =  "";
-};
-
 struct function_t
 {
     char functionCode   = NOTAFUNC;
     int  returningType  = POISON_FRMT;
 
-    argument_t arguments [MAX_NUM_ARGUMEN] = {};
+    variable_t arguments [MAX_NUM_ARGUMEN] = {};
     int        numOfArguments              = -1;
 
     variable_t VariablesCODE [MAX_NUM_INT_VAR] = {};
