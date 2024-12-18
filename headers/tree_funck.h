@@ -18,10 +18,4 @@ int     makeTex       (FILE *outputFile);
 int     delete_tree   (node_t *deleatingNode);
 node_t *copyNode      (node_t *copingNode, tree_t *currTree);
 
-
-
-
-
-
-
 #endif /*TREE_FUNK*/

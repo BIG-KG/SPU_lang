@@ -1,11 +1,11 @@
-#include <cstddef>
 #ifndef COMPILLER_TYPES
 #define COMPILLER_TYPES
+
+#include <cstddef>
 
 #include "tree_types.h"
 
 const int NANODE = -1;
-const int NOTAFUNC    = -1;
 
 const int MAX_VARIABLE_NAME_SIZE = 128;
 
@@ -20,11 +20,18 @@ struct argument_t
     int argumentFrmt = POISON_FRMT;
 };
 
+struct analis_variable_t
+{
+    int  initialized                          = 0;
+    int  variableFrmt                         = POISON_FRMT;
+    char variableName[MAX_VARIABLE_NAME_SIZE] = "";
+};
+
 struct variable_t
 {
     int  variableCode                         = -1;
-    int  variableFrmt                         = POISON_FRMT;
-    char variableName[MAX_VARIABLE_NAME_SIZE] = "";
+    int  variableFrmt                         =  POISON_FRMT;
+    char variableName[MAX_VARIABLE_NAME_SIZE] =  "";
 };
 
 struct function_t
@@ -38,12 +45,12 @@ struct function_t
     variable_t VariablesCODE [MAX_NUM_INT_VAR] = {};
     int        numberOfVar                     =  0;
 
-    analis_node_t *commands[128]      = {};
-    int            numOfCommands = 0;
+    analis_node_t commandStart  = {};
+    int           numOfCommands = 0;
 };
 
 enum element_types
-{
+{   
     CONST,
     VARIABLE,
     FUNC,
@@ -58,7 +65,8 @@ enum element_types
     COMMA,
     BRAKES,
     END_OF_PROGRAM,
-    SYNTAX_ERROR
+    SYNTAX_ERROR,
+    EMPTY_NODE
 };
 
 enum codeWords
@@ -90,7 +98,7 @@ enum comparison
     LESS_OR_EQU,
     LESS,
     GEATER
-}
+};
 
 
 struct processing_programm_t

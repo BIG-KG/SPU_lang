@@ -12,6 +12,7 @@ const int FILE_NAME_SIZE = 64;
 
 extern char funcs[20][20];
 
+/*
 int generate_html(tree_t *tree)
 {
 
@@ -61,10 +62,21 @@ char *generate_png(tree_t *dumpingTree, int dumpNum)
     system (sysCommand);
 
     return pngFile_name;
-}
+}*/
 
 
-void print_node(node_t *curr_node, FILE *txtFile)
+// void console_print_node(analis_node_t *curr_node)
+// {   
+//     do
+//     {
+//         printf("TYPE: %d DATA: %d", )
+//     }    
+
+
+// }
+
+/*
+void console_print_node(node_t *curr_node, FILE *txtFile)
 {   
     fprintf (txtFile, "\tnode%d [shape=Mrecord, style=\"rounded, filled\"", curr_node);
 
@@ -101,4 +113,4 @@ void print_node(node_t *curr_node, FILE *txtFile)
     }
 
     return;
-}
+}*/

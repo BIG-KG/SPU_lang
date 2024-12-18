@@ -8,18 +8,26 @@
 
 #include <tree_types.h>
 #include <tree_funck.h>
-#include <tree_data_base_funk.h>
+//#include <tree_data_base_funk.h>
 #include <tree_const.h>
-#include <calculator.h>
-#include <comporator.h>
+//#include <calculator.h>
 #include <compiller_types.h>
 
 static int isInicialiser  (analis_node_t testingNode);
 static int isRightBracket (analis_node_t testingNode, int rightBrackes);
 
-static void           getInicialArgs(function_t *currFunc, processing_programm_t *currProg);
-static void           getCommands   (function_t *currFunc, processing_programm_t *currProg);
-static analis_node_t *getExpression(function_t *currFunc, processing_programm_t *currProg);
+static void           getInicialArgs (function_t *currFunc, processing_programm_t *currProg);
+static void           getCommands    (function_t *currFunc, processing_programm_t *currProg, analis_node_t *startNode);
+static analis_node_t *getExpression  (function_t *currFunc, processing_programm_t *currProg);
+static void           getFunction    (processing_programm_t *currProg);
+static analis_node_t *getSumSub      (function_t *currFunc, processing_programm_t *currProg);
+static analis_node_t *getMulDiv      (function_t *currFunc, processing_programm_t *currProg);
+static analis_node_t *getBrackets    (function_t *currFunc, processing_programm_t *currProg);
+static analis_node_t *getElementar   (function_t *currFunc, processing_programm_t *currProg);
+static void           getFuncArgs    (function_t *currFunc, analis_node_t *currfuncCall,  processing_programm_t *currProg, int funckNum);
+static analis_node_t *getCodeword    (function_t *currFunc, processing_programm_t *currProg);
+static analis_node_t *getNewVar      (function_t *currFunc, processing_programm_t *currProg);
+static analis_node_t *getWhile       (function_t *currFunc, processing_programm_t *currProg);
 
 
 
@@ -43,7 +51,6 @@ extern char funcs[][20];
     global_errors = SYNTAX_ERROR;           \
     return NULL;                            \
 
-
 int global_errors = 0;
 
 node_t *getMain(analis_node_t *nodeArr)
@@ -54,10 +61,10 @@ node_t *getMain(analis_node_t *nodeArr)
     int        numOfFunction                  = 0;
 
     processing_programm_t currProg = {};
-    currProg.nodeArr       =  nodeArr;  
-    currProg.currNode      = &currNode;    
-    currProg.numOfFunction = &numOfFunction;
-    currProg.functionArr   =  functionArray;
+    currProg.nodeArr               =  nodeArr;  
+    currProg.currNode              = &currNode;    
+    currProg.numOfFunction         = &numOfFunction;
+    currProg.functionArr           =  functionArray;
 
 
     while (isInicialiser(nodeArr[currNode]))
@@ -111,7 +118,7 @@ void getFunction (processing_programm_t *currProg)
     if (isRightBracket (nodeArr[*currNode], '{') == 0){GLOBAL_ERROR}
     pp(*currNode);
 
-    getCommands(&functionArray[*numOfFunc], currProg);
+    getCommands(&functionArray[*numOfFunc], currProg, &functionArray[*numOfFunc].commandStart);
 
     if (isRightBracket (nodeArr[*currNode], '}') == 0){GLOBAL_ERROR}
     pp(*currNode);
@@ -165,12 +172,14 @@ static void getInicialArgs(function_t *currFunc, processing_programm_t *currProg
 }
 
 
-static void getCommands(function_t *currFunc, processing_programm_t *currProg)
+static void getCommands(function_t *currFunc, processing_programm_t *currProg, analis_node_t *startNode)
 {
     function_t    *functionArray = currProg->functionArr;
     analis_node_t *nodeArr       = currProg->nodeArr;
     int           *currNode      = currProg->currNode;
     int           *numOfFunc     = currProg->numOfFunction;
+
+    analis_node_t *currCommand = startNode;
 
     analis_node_t *returningNode = NULL;
 
@@ -185,11 +194,15 @@ static void getCommands(function_t *currFunc, processing_programm_t *currProg)
             returningNode = getExpression(currFunc, currProg);
         }
 
-        currFunc->commands[currFunc->numOfCommands] = returningNode;
-        pp(currFunc->numOfCommands);
+        currCommand->right = returningNode;
 
+        if (nodeArr[*currNode].nodeType != CODEWORD     ||
+              nodeArr[*currNode].nodeData.int_el != END_COMMAND) return;
 
-        if (nodeArr[*currNode].nodeType == CODEWORD != ';') return;
+        nodeArr[*currNode].nodeType = EMPTY_NODE;
+        nodeArr[*currNode].nodeData.int_el != 0;
+
+        currCommand = &nodeArr[*currNode];
     }
 
 
@@ -207,7 +220,7 @@ static analis_node_t *getExpression(function_t *currFunc, processing_programm_t 
     analis_node_t *equal = NULL;
     analis_node_t *right = NULL;
 
-    if (left == NULL) return;
+    if (left == NULL) {GLOBAL_ERROR_NULL};
 
 
     if (nodeArr[*currCommnd].nodeType != EQUAL && nodeArr[*currCommnd].nodeType != COMPARISON)
@@ -223,7 +236,7 @@ static analis_node_t *getExpression(function_t *currFunc, processing_programm_t 
         {
             printf("You can assign only to variables\n");
 
-            GLOBAL_ERROR;
+            GLOBAL_ERROR_NULL;
         }
         //________________________________________________________________________
         
@@ -234,14 +247,14 @@ static analis_node_t *getExpression(function_t *currFunc, processing_programm_t 
 
         equal->right = getSumSub(currFunc, currProg); 
 
-        if (equal->right == NULL){GLOBAL_ERROR}
+        if (equal->right == NULL){GLOBAL_ERROR_NULL}
 
         //Remove for rechecking___________________________________________________
 
         if (equal->left->nodeFormat != equal->right->nodeFormat)
         {
             printf("Сast types before assignment\n");
-            GLOBAL_ERROR
+            GLOBAL_ERROR_NULL
         }
 
         equal->nodeType = equal->left->nodeType;
@@ -262,7 +275,7 @@ static analis_node_t *getSumSub (function_t *currFunc, processing_programm_t *cu
     analis_node_t *left  = getMulDiv (currFunc, currProg);
     analis_node_t *oper = NULL;
 
-    if (left == NULL) return;
+    if (left == NULL) return NULL;
 
 
     while ( nodeArr[*currCommnd].nodeType        == OPER         && 
@@ -275,14 +288,14 @@ static analis_node_t *getSumSub (function_t *currFunc, processing_programm_t *cu
         pp(*currNode);
         oper->right = getMulDiv(currFunc, currProg); 
 
-        if (oper->right == NULL){GLOBAL_ERROR}
+        if (oper->right == NULL){GLOBAL_ERROR_NULL}
 
         //Remove for rechecking___________________________________________
 
         if (oper->left->nodeFormat != oper->right->nodeFormat)
         {
             printf ("Сast types before assignment in SumSub\n");
-            GLOBAL_ERROR
+            GLOBAL_ERROR_NULL
         }
 
         oper->nodeType = oper->left->nodeType;
@@ -304,7 +317,7 @@ static analis_node_t * getMulDiv (function_t *currFunc, processing_programm_t *c
     analis_node_t *oper = NULL;
     analis_node_t *right = NULL;
 
-    if (left == NULL) return;
+    if (left == NULL) return NULL;
 
 
     while ( nodeArr[*currCommnd].nodeType == OPER                    && 
@@ -317,14 +330,14 @@ static analis_node_t * getMulDiv (function_t *currFunc, processing_programm_t *c
         pp(*currNode);
         oper->right = getBrackets (currFunc, currProg); 
 
-        if (oper->right == NULL){GLOBAL_ERROR}
+        if (oper->right == NULL){GLOBAL_ERROR_NULL}
 
         //_______________________________________________________________
 
         if (oper->left->nodeFormat != oper->right->nodeFormat)
         {
             printf ("Сast types before assignment in SumSub\n");
-            GLOBAL_ERROR
+            GLOBAL_ERROR_NULL
         }
 
         oper->nodeType = oper->left->nodeType;
@@ -348,7 +361,7 @@ static analis_node_t *getBrackets(function_t *currFunc, processing_programm_t *c
 
         returningNode =  getSumSub(currFunc, currProg);
 
-        if (isRightBracket(nodeArr[*currNode], ')') == 0){GLOBAL_ERROR}
+        if (isRightBracket(nodeArr[*currNode], ')') == 0){GLOBAL_ERROR_NULL}
 
         pp(*currNode);  
 
@@ -372,7 +385,7 @@ static analis_node_t *getElementar(function_t *currFunc, processing_programm_t *
     if (nodeArr[*currNode].nodeType == FRMT_CHANGE)
     {
         if( !isInicialiser(nodeArr[*currNode + 1]) || 
-             nodeArr[*currNode].nodeType != FRMT_CHANGE) {GLOBAL_ERROR}
+             nodeArr[*currNode].nodeType != FRMT_CHANGE) {GLOBAL_ERROR_NULL}
 
         pp(*currNode);
 
@@ -429,13 +442,14 @@ static analis_node_t *getElementar(function_t *currFunc, processing_programm_t *
                 break;
             }
         }
-        //______________________________________________________________________________
 
-        if (findfunc == false)
+        if (findFunc == false)
         {
             printf("NO SUCH FUNC\n");
             GLOBAL_ERROR_NULL;
         }
+
+        //______________________________________________________________________________
 
         pp(*currNode);
         if (isRightBracket (nodeArr[*currNode], '(') == 0) {GLOBAL_ERROR_NULL}
@@ -509,7 +523,7 @@ static analis_node_t *getCodeword (function_t *currFunc, processing_programm_t *
     case IF_CODE_WORD:
     case WHILE_CODE_WORD:
         getWhile(currFunc, currProg);
-        return;
+        return NULL;
     default:
         break;
     }
@@ -517,16 +531,16 @@ static analis_node_t *getCodeword (function_t *currFunc, processing_programm_t *
     if (isInicialiser(nodeArr[*currNode]))
     {
         getNewVar(currFunc, currProg);
-        return;
+        return NULL;
     }
     else
     {
         printf("ERROR\n");
-        GLOBAL_ERROR
+        GLOBAL_ERROR_NULL
     }
 }
 
-static void getNewVar (function_t *currFunc, processing_programm_t *currProg)
+static analis_node_t *getNewVar (function_t *currFunc, processing_programm_t *currProg)
 {
     function_t    *functionArray = currProg->functionArr;
     analis_node_t *nodeArr       = currProg->nodeArr;
@@ -534,18 +548,16 @@ static void getNewVar (function_t *currFunc, processing_programm_t *currProg)
     int           *numOfFunc     = currProg->numOfFunction;
 
     analis_node_t *inicialiser = &nodeArr[*currNode];
-    currFunc->commands[currFunc->numOfCommands] = inicialiser;
-    pp(currFunc->numOfCommands);
 
     inicialiser->right = getExpression(currFunc, currProg);
 
-    if ( nodeArr[*currNode].nodeType != END_COMMAND ) {GLOBAL_ERROR}
+    return inicialiser;
 
     return;    
 }
 
 
-static void getWhile (function_t *currFunc, processing_programm_t *currProg)
+static analis_node_t *getWhile (function_t *currFunc, processing_programm_t *currProg)
 {
     function_t    *functionArray = currProg->functionArr;
     analis_node_t *nodeArr       = currProg->nodeArr;
@@ -553,17 +565,11 @@ static void getWhile (function_t *currFunc, processing_programm_t *currProg)
     int           *numOfFunc     = currProg->numOfFunction;
 
     analis_node_t *whileNode = &nodeArr[*currNode];
-
-    currFunc->commands[currFunc->numOfCommands] = &nodeArr[*currNode];
-    pp(currFunc->numOfCommands);
-
     pp(*currNode);
-
 
     if ( isRightBracket (nodeArr[*currNode], '(') ) {GLOBAL_ERROR}
     pp(*currNode);
-    getIfArg(whileNode, currFunc, currProg);
-    currFunc->commands[currFunc->numOfCommands] = &nodeArr[*currNode];
+    whileNode->left = getExpression(currFunc, currProg);
     pp(currFunc->numOfCommands);
 
     if ( isRightBracket (nodeArr[*currNode], ')') ) {GLOBAL_ERROR}
@@ -573,32 +579,11 @@ static void getWhile (function_t *currFunc, processing_programm_t *currProg)
 
     if ( isRightBracket (nodeArr[*currNode], '{') ) {GLOBAL_ERROR}
     pp(*currNode);
-    getCommands(currFunc, currProg);
+    getCommands(currFunc, currProg, whileNode);
     if ( isRightBracket (nodeArr[*currNode], '}') ) {GLOBAL_ERROR}
-
-    nodeArr[*currNode].nodeType = CODEWORD;
-    if (whileNode->nodeData.int_el == WHILE_CODE_WORD)
-    {
-        nodeArr[*currNode].nodeData.int_el = ENDWILE_CODE_WORD;
-    }
-    else
-    {
-        nodeArr[*currNode].nodeData.int_el = ENDIF_CODE_WORD;
-    }
-    
-
-    currFunc->commands[currFunc->numOfCommands] = &nodeArr[*currNode];
-    pp(currFunc->numOfCommands);
-
     pp(*currNode);
-    
-    return;
-    
-}
 
-static void getIfArg (analis_node_t *headNode, function_t *currFunc, processing_programm_t *currProg)
-{
-    headNode->right = getExpression(currFunc, currProg);
+    return whileNode;     
 }
 
 static int isInicialiser(analis_node_t testingNode)

@@ -6,38 +6,43 @@
 #include <math.h>
 #include <ctype.h>
 
-#include "..\headers\tree_types.h"
-#include "..\headers\tree_funck.h"
-#include "..\headers\tree_data_base_funk.h"
-#include "..\headers\tree_const.h"
-#include "..\headers\calculator.h"
-#include "..\headers\comporator.h"
-#include "..\headers\errors.h"
+#include <tree_types.h>
+#include <tree_funck.h>
+//#include <tree_data_base_funk.h>
+#include <tree_const.h>
+//#include <calculator.h>
 #include <compiller_types.h>
 
 #define pp(a) a = a + 1 
 
 const int START_ARR = 16;
 const int MAX_COMMAND_SIZE = 128;
-char      string[100] = "x = 5y - sin(2);";
 int       currEl = 0;
 
-extern codeWord_t       codeWordArr[];
-extern variable_t       variableArr[];
-extern funktion_names_t funcsArr[];
+extern codeWord_t        codeWordArr[];
+extern funktion_names_t *funcsArr;
+analis_variable_t       variableArr[20] = {};
+
 
 static analis_node_t make_funknode         (char *funckName);
-static int           isBracket             (char chekingEl);
+static analis_node_t make_onlyType_node    (int type);
 static analis_node_t scanDouble            (const char *string, int *startEl);
 static analis_node_t scanOperation         (const char *string, int *startEl);
 static analis_node_t scanWord              (const char *string, int *startEl);
 static analis_node_t make_endOfCommandNode ();
+static analis_node_t make_variableNode     (char * command);
+static analis_node_t make_operation_node   (int codewordCode);
+static analis_node_t scanEquality          (const char *string, int *startEl);
+static analis_node_t make_brakesNode       (const char *string, int *startEl);
+static int           isComparison          (char chekingEl);
+static int           isOperation           (char chekingEl);
+static int           isBracket             (char chekingEl);
 
 
 int element_type (char checkingEl)
 {   
     if (isBracket (checkingEl))   return BRAKES;
-    if (isOperation (currEl))     return OPER;
+    if (isOperation (checkingEl)) return OPER;
     if (isalpha (checkingEl))     return WORD_EL;
     if (isalnum (checkingEl))     return CONST;
     if (checkingEl == ':')        return FRMT_CHANGE;
@@ -50,14 +55,16 @@ int element_type (char checkingEl)
 
 analis_node_t *startLing (const char *string)
 {
+    analis_node_t *nodeArr   = (analis_node_t *) calloc (START_ARR, sizeof(analis_node_t));
     int     currNodeCapacity = START_ARR; 
-    analis_node_t *nodeArr  = (analis_node_t *) calloc (START_ARR, sizeof(analis_node_t));
-    int     currEL   = 0;
-    int     currNode = 0;
-    int     currType = ERROR_EL;
+    int     currEL           = 0;
+    int     currNode         = 0;
+    int     currType         = ERROR_EL;
+    
 
     while (string[currEl] != '\0') 
     {
+        printf("while\n");
         while ( isspace (string[currEl]) ) currEl++;
         
         currType = element_type (string[currEl]);
@@ -74,6 +81,7 @@ analis_node_t *startLing (const char *string)
                 break;
 
             case WORD_EL:
+                printf("wordEl\n");
                 nodeArr[currNode] = scanWord (string, &currEl);
                 break;
 
@@ -126,7 +134,8 @@ analis_node_t *startLing (const char *string)
             nodeArr = tmpNodeArr;
         }
 
-        currNode ++;   
+        currNode ++; 
+        currEl ++;  
     }
 
     nodeArr[currNode] = make_onlyType_node(END_OF_PROGRAM);
@@ -254,11 +263,15 @@ analis_node_t scanWord (const char *string, int *startEl)
     command[currPos] = '\0';
     *startEl = *startEl + currPos;
 
+    //printf("test func\n");
+
     if (string[*startEl + currPos] == '(')
     {   
         *startEl = *startEl + 1;
         return make_funknode (command);
     }
+    
+    //printf("test codeWord\n");
 
     for (int i = 0; codeWordArr[i].codeWordCode != NAO; i++)
     {
@@ -267,6 +280,8 @@ analis_node_t scanWord (const char *string, int *startEl)
             return make_operation_node (i);
         }
     }
+
+    //printf("variabl\n");
     return make_variableNode (command); 
 }
 
@@ -349,7 +364,7 @@ static analis_node_t make_funknode(char * command)
     return returningNode;
 }
 
-analis_node_t scanEquality (const char *string, int *startEl)
+static analis_node_t scanEquality (const char *string, int *startEl)
 {   
     char operation[3]           = "";
     analis_node_t returningNode = {};
@@ -405,16 +420,16 @@ static analis_node_t make_variableNode (char * command)
 
     int i = 0;
 
-    for (int i; variableArr[i].variableCode != NAO; i++)
+    for (int i; variableArr[i].initialized != 0; i++)
     {
         if (strcmp (variableArr[i].variableName, command) == 0)
         {
-            returningNode.nodeData.int_el = variableArr[i].variableCode;
+            returningNode.nodeData.int_el = i;
             return returningNode;
         }
     }
 
-    variableArr[i].variableCode = i;
+    variableArr[i].initialized = 1;
     strcpy(variableArr[i].variableName, command);
     returningNode.nodeData.int_el = i;
 

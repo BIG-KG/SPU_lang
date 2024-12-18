@@ -1,4 +1,4 @@
-#include <stdio.h>
+/*#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -543,3 +543,4 @@ int easy_const_const (node_t *currNode)
 
     return NO_CHANGES;
 }
+*/

@@ -1,17 +1,18 @@
-CC = gcc
+SRCS = $(wildcard sourse/*.cpp)
 
-CFLAGS = -Wall -g
+OBJS = $(SRCS:.cpp=.o)
 
-SRCS = $(wildcard sourse\*.c)
+all: hello 
 
-OBJS = $(SRCS:.c=.o)
+hello: $(OBJS) main.o
+	g++ main.o $(OBJS) -o hell.exe
 
-all: $(OBJS)
+main.o: main.cpp
+	g++ -I ./headers main.cpp -c
 
-%.o: %.c
- $(CC) $(CFLAGS) -c $< -o $@
+%.o: %.cpp
+	g++ -I ./headers -c $< -o $@
 
 clean:
- rm -f $(OBJS)
-
-.PHONY: all clean
+	DEL *.o
+	DEL *.exe

@@ -9,13 +9,6 @@ const int MAX_FUNKTION_NAME_SIZE  = 128;
 const int NAO = -1;
 const int NOTAFUNC = -1;
 
-enum dataTypes
-{
-    FUNC = 2,
-    CONST = 3,
-    VARIABLE = 4
-};
-
 enum funcs
 {
     SIN,
@@ -56,6 +49,7 @@ union analis_node_data
     int    int_el;
 };
 
+
 enum dataFormats
 {
     POISON_FRMT = -1,
@@ -68,14 +62,14 @@ struct lingAnalis_t
 {
     int              nodeType   = -1; //no data type has code -1
     analis_node_data nodeData   = {};
-    int              nodeFormat = POISON_FORMAT;
+    int              nodeFormat = POISON_FRMT;
 };
 
 struct analis_node_t
 {
     int               nodeType   = -1; //no data type has code -1
     analis_node_data  nodeData   = {};
-    int               nodeFormat = POISON_FORMAT;
+    int               nodeFormat = POISON_FRMT;
     analis_node_t    *right = NULL; 
     analis_node_t    *left  = NULL;
 
@@ -110,16 +104,13 @@ struct node_way_t
 struct codeWord_t
 {
     int  codeWordCode = NAO;
-    char wordName[MAX_OPERATION_NAME_SIZE] = "";
+    char *wordName     = NULL;
 };
 
 struct funktion_names_t
 {
     int  funktionCode = NOTAFUNC;
     char funktionName[MAX_FUNKTION_NAME_SIZE] = "";
-          numOfArguments = -1;
 };
-
-codeWord_t o = {};  
 
 #endif /*TREE_TYPES*/
