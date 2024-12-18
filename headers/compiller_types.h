@@ -25,17 +25,17 @@ struct analis_variable_t
     int  initialized                          = 0;
     int  variableFrmt                         = POISON_FRMT;
     char variableName[MAX_VARIABLE_NAME_SIZE] = "";
-};
+};  
 
 struct function_t
 {
     char functionCode   = NOTAFUNC;
     int  returningType  = POISON_FRMT;
 
-    variable_t arguments [MAX_NUM_ARGUMEN] = {};
+    variable_t argumentsArray [MAX_NUM_ARGUMEN] = {};
     int        numOfArguments              = -1;
 
-    variable_t VariablesCODE [MAX_NUM_INT_VAR] = {};
+    variable_t VariablesArray [MAX_NUM_INT_VAR] = {};
     int        numberOfVar                     =  0;
 
     analis_node_t commandStart  = {};
@@ -59,7 +59,8 @@ enum element_types
     COMMA,
     BRAKES,
     SYNTAX_ERROR,
-    EMPTY_NODE
+    EMPTY_NODE,
+    DATA_SAVE_NODE
 };
 
 enum codeWords
