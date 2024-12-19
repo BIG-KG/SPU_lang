@@ -68,7 +68,7 @@ function_t *getMain(analis_node_t *nodeArr)
     currProg.numOfFunction         = &numOfFunction;
     currProg.functionArr           =  functionArray;
 
-    printf("start ini++++++++++++++++++++++++++++++++++++++++++++++++\n");
+    printf("start ini++++++++++++++++++++++++++++++++++++++++++++++\n");
 
     while (isInicialiser(nodeArr[currNode]))
     {
@@ -78,7 +78,7 @@ function_t *getMain(analis_node_t *nodeArr)
         if (global_errors != 0) break;
     }
 
-    printf("int init:::::::::::::::::::::::::::::::::::::::::::::::::num of args = %d\n", functionArray->numOfArguments);
+    //printf("int init::::::::::::::::::::::::::::::::::::::::::::::::: num of args = %d\n", functionArray->numOfArguments);
     
     if (nodeArr[currNode].nodeType != END_OF_PROGRAM)
     {
@@ -138,6 +138,7 @@ static void getInicialArgs(function_t *currFunc, processing_programm_t *currProg
     int           *currNode      = currProg->currNode;
 
     int *numOfArg = &currFunc->numOfArguments;
+    int *numOfVar = &currFunc->numberOfVar;
     int  currFrmt =  POISON_FRMT;
     int  currCode =  -1;
 
@@ -156,6 +157,7 @@ static void getInicialArgs(function_t *currFunc, processing_programm_t *currProg
         currCode = (currFunc->argumentsArray[*numOfArg].variableCode = nodeArr[*currNode].nodeData.int_el);
         pp(*currNode);
 
+
         pp(*numOfArg);
 
         if (nodeArr[*currNode].nodeType == COMMA)
@@ -164,7 +166,6 @@ static void getInicialArgs(function_t *currFunc, processing_programm_t *currProg
         }
     }
 
-    //memcpy ( currFunc->VariablesCODE, currFunc->arguments, *numOfArg * sizeof(variable_t));
     return;    
 }
 
@@ -405,7 +406,7 @@ static analis_node_t *getElementar(function_t *currFunc, processing_programm_t *
 
     if (nodeArr[*currNode].nodeType == FUNC)
     {   
- 
+
         bool findFunc = false;
         int i = 0;
 
@@ -459,9 +460,9 @@ static void getFuncArgs(function_t *currFunc, analis_node_t *currfuncCall,  proc
     int           *numOfFunc     = currProg->numOfFunction;
 
 
-    analis_node_t *right    = currfuncCall;
-    variable_t    *argTypes = currProg->functionArr[funckNum].argumentsArray;
-    int numOfArgs           = currProg->functionArr[funckNum].numOfArguments;
+    analis_node_t *right     = currfuncCall;
+    variable_t    *argTypes  = currProg->functionArr[funckNum].argumentsArray;
+    int            numOfArgs = currProg->functionArr[funckNum].numOfArguments;
 
 
 //If you remove this check, you can add functions to a variable number of variables. + improve structuring by stages
@@ -533,7 +534,6 @@ static analis_node_t *getNewVar (function_t *currFunc, processing_programm_t *cu
     int           *numOfFunc     = currProg->numOfFunction;
 
     analis_node_t *inicialiser = &nodeArr[*currNode];
-    pp(*currNode);
 
     inicialiser->right = getExpression(currFunc, currProg);
 
