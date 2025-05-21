@@ -1,0 +1,12 @@
+int factor(int i)
+{ 
+    if (i ?= 1){return 1;}; 
+    int k = factor(i - 1);
+    return (i * k);
+}
+int main()
+{
+    
+    int ans = factor(y);
+    print ans;
+}

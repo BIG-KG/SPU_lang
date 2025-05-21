@@ -80,7 +80,7 @@ void print_node(analis_node_t *curr_node, FILE *txtFile)
 {   
     fprintf (txtFile, "\tnode%d [shape=Mrecord, style=\"rounded, filled\"", curr_node);
 
-    fprintf (txtFile, ", label = \"%d \" ]; \n", curr_node->nodeType);
+    fprintf (txtFile, ", label = \"%d| %d\" ]; \n", curr_node->nodeType, curr_node->nodeData.int_el);
 
     if(curr_node->left != NULL)
     {   

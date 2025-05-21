@@ -1,4 +1,4 @@
-#ifndef TREE_TYPES
+    #ifndef TREE_TYPES
 #define TREE_TYPES
 
 #include <stdint.h>

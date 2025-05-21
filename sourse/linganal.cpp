@@ -8,7 +8,7 @@
 
 #include <tree_types.h>
 #include <tree_funck.h>
-//#include <tree_data_base_funk.h>
+#include <colors.h>
 #include <tree_const.h>
 //#include <calculator.h>
 #include <compiller_types.h>
@@ -19,10 +19,11 @@ const int START_ARR = 128; //BAG_WIGTH REALLOC
 const int MAX_COMMAND_SIZE = 128;
 int       currEl = 0;
 
-extern codeWord_t        codeWordArr[];
+extern codeWord_t       codeWordArr[];
 extern funktion_names_t funcsArr[];
-analis_variable_t       variableArr[20] = {};
+analis_variable_t       variableArr[128] = {};
 
+//#define int bool
 
 static analis_node_t make_funknode         (char *funckName);
 static analis_node_t make_onlyType_node    (int type);
@@ -39,7 +40,7 @@ static int           isOperation           (char chekingEl);
 static int           isBracket             (char chekingEl);
 
 
-int element_type (char checkingEl)
+element_types element_type (char checkingEl)
 {   
     printf("chekingEL = _%c_\n", checkingEl);
     
@@ -61,7 +62,7 @@ analis_node_t *startLing (const char *string)
     int     currNodeCapacity = START_ARR; 
     int     currEl           = 0;
     int     currNode         = 0;
-    int     currType         = ERROR_EL;
+    element_types currType   = ERROR_EL;
     
 
     while (string[currEl] != '\0') 
@@ -176,32 +177,10 @@ static analis_node_t make_brakesNode (const char *string, int *startEl)
 
     returningNode.nodeType = BRAKES;
     // REFACTOR WITH CODEGEN!!!!!!!!!!!!!!!!!!!!!!!!
-    switch (string[*startEl])
-    {
-        case '(':
-            returningNode.nodeData.int_el = '(';
-            break;
-        case ')':
-            returningNode.nodeData.int_el = ')';
-            break;
-        case '[':
-            returningNode.nodeData.int_el = '[';
-            break;
-        case ']':
-            returningNode.nodeData.int_el = ']';
-            break;
-        case '{':
-            returningNode.nodeData.int_el = '{';
-            break;
-        case '}':
-            returningNode.nodeData.int_el = '}';
-            break;
-    //REFACTOR WITH CODEGEN!!!!!!!!!!!!!!!!!!!!!!!!
-        default:
-            returningNode.nodeData.int_el = SYNTAX_ERROR;
-            break;
-    }
-    pp(*startEl);
+    returningNode.nodeData.int_el = string[*startEl];
+
+   
+    (*startEl)++;
 
     return returningNode;
 }
@@ -240,27 +219,16 @@ static analis_node_t scanOperation (const char *string, int *startEl)
 
 static analis_node_t scanDouble (const char *string, int *startEl)
 {
-    double value = 0.0;
+    int value = 0;
     analis_node_t returningNode = {CONST, };
 
-    while (isalnum(string[*startEl]))
+    while (isdigit(string[*startEl]))
     {
         value = value * 10 + string[*startEl] - '0';
         *startEl = *startEl + 1;
     }
 
-    if (string[*startEl] == '.')
-    {
-        *startEl = *startEl + 1;
-        double pow = 0.1;
-        while (isalnum (string[*startEl]))
-        {
-            value += pow * (string[*startEl] - '0'); 
-            *startEl = *startEl + 1;
-        }
-    }
-
-    returningNode.nodeData.double_el = value;
+    returningNode.nodeData.int_el = value;
 
     return returningNode;
 }
@@ -315,10 +283,8 @@ static int isBracket (char chekingEl)
         case '[':
         case ']':
             return 1;
-            break;
         default:
             return 0;
-            break;
     }
 }
 
@@ -331,10 +297,8 @@ static int isOperation(char chekingEl)
         case '/':
         case '*':
             return 1;
-            break;
         default:
             return 0;
-            break;
     }
 }
 
@@ -348,10 +312,8 @@ static int isComparison(char chekingEl)
         case '!':
         case '?':
             return 1;
-            break;
         default:
             return 0;
-            break;
     }
 }
 
@@ -370,7 +332,8 @@ static analis_node_t make_funknode(char * command)
     printf("startfind funcnode\n");
 
     int i = 0;
-    for(i; funcsArr[i].funktionCode != NOTAFUNC; i++)
+    printf("%sSTART SEARCH%s\n",YELLOW, RESET);
+    for(; funcsArr[i].funktionCode != NOTAFUNC; i++)
     {
         if (strcmp (funcsArr[i].funktionName, command) == 0)
         {
@@ -378,11 +341,12 @@ static analis_node_t make_funknode(char * command)
             return returningNode;
         }    
     }
-
-    printf("endfind funcnode\n");
+    printf("%sEND SEARCH i = %d %s\n",YELLOW, i,RESET);
 
     funcsArr[i].funktionCode = i;
+    printf("endfind funcnode %s\n", command);
     strcpy (funcsArr[i].funktionName, command);
+    printf("end2\n");
     returningNode.nodeData.int_el = i;
 
     printf("end funcnode type = %d\n", returningNode.nodeType);
@@ -403,7 +367,7 @@ static analis_node_t scanEquality (const char *string, int *startEl)
         *startEl = *startEl + 2;
 
         if ( !strcmp(operation, "?=") ) returningNode.nodeData.int_el = IS_EQUAL;
-        if ( !strcmp(operation, "!=") ) returningNode.nodeData.int_el = IS_EQUAL;
+        if ( !strcmp(operation, "!=") ) returningNode.nodeData.int_el = IS_NOT_EQUAL;
         if ( !strcmp(operation, ">=") ) returningNode.nodeData.int_el = GREATER_OR_EQU;
         if ( !strcmp(operation, "<=") ) returningNode.nodeData.int_el = LESS_OR_EQU;
     }
@@ -412,7 +376,7 @@ static analis_node_t scanEquality (const char *string, int *startEl)
         operation[0] = string[*startEl];
         pp(*startEl);
 
-        if( !strcmp(operation, ">")  ) returningNode.nodeData.int_el = GEATER;
+        if( !strcmp(operation, ">")  ) returningNode.nodeData.int_el = GREATER;
         if( !strcmp(operation, "<")  ) returningNode.nodeData.int_el = LESS;
         if( !strcmp(operation, "=")  ) 
         {
@@ -446,16 +410,21 @@ static analis_node_t make_variableNode (char * command)
 
     int i = 0;
 
-    for (int i; variableArr[i].initialized != 0; i++)
+    printf("%sSTART SEARCH VARIABLE%s\n", YELLOW, RESET);
+    for (; variableArr[i].initialized != 0; i++)
     {
+        printf("asdca\n");
         if (strcmp (variableArr[i].variableName, command) == 0)
         {
+            printf("FIND VAR\n");
             returningNode.nodeData.int_el = i;
             return returningNode;
         }
     }
 
-    variableArr[i].initialized = 1;
+    printf("END SEARCH VARIABLE%s\n", RESET);
+
+    variableArr[i].initialized = 1; // initialized replace with number of valid vars
     strcpy(variableArr[i].variableName, command);
     returningNode.nodeData.int_el = i;
 

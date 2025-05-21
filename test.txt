@@ -1,0 +1,52 @@
+push 0
+pop [BX+0]
+input
+pop [BX+0]
+push [BX+2]
+
+push BX
+push 2
+add
+pop BX
+call :fn_1
+push BX
+push 2
+sub
+pop BX
+
+pop [BX+1]
+push [BX+1]
+look
+end
+
+
+^fn_1
+pop [BX+0]
+push [BX+0]
+push 1
+push [BX+0]
+push 1
+jmpl :if_0
+jmpm :if_0
+push 1
+ret
+^if_0
+push [BX+0]
+push 1
+sub
+
+push BX
+push 2
+add
+pop BX
+call :fn_1
+push BX
+push 2
+sub
+pop BX
+
+pop [BX+1]
+push [BX+0]
+push [BX+1]
+mul
+ret

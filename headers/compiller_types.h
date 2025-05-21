@@ -31,6 +31,7 @@ struct function_t
 {
     char functionCode   = NOTAFUNC;
     int  returningType  = POISON_FRMT;
+    int  initialized   = 0;
 
     variable_t argumentsArray [MAX_NUM_ARGUMEN] = {};
     int        numOfArguments              = -1;
@@ -70,7 +71,9 @@ enum codeWords
     ENDWILE_CODE_WORD,
     WHILE_CODE_WORD,
     INT_CODE_WORD,
-    RETURN
+    RETURN,
+    PRINT,
+    INPUT
 };
 
 enum brackets
@@ -91,7 +94,7 @@ enum comparison
     GREATER_OR_EQU,
     LESS_OR_EQU,
     LESS,
-    GEATER
+    GREATER
 };
 
 
@@ -103,5 +106,7 @@ struct processing_programm_t
     int           *numOfFunction = NULL;
 };
 
+function_t *getMain(analis_node_t *nodeArr);
+int        file_size(FILE* targetFile);
 
 #endif
